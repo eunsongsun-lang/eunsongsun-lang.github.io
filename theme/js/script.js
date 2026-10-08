@@ -31,6 +31,7 @@ requirejs.config({
     }
 });
 
+//keep in sync with jnz_preload_scripts() in functions.php
 requirejs( [ 'require', 'jquery', 'Headroom', 'ScrollMagic', 'Flickity', 'Modernizr', 'history'/*, 'ScrollMagic.indicators'*/ ],
     function( require, $, Headroom, ScrollMagic, Flickity, Modernizr ) {
 
@@ -330,8 +331,23 @@ requirejs( [ 'require', 'jquery', 'Headroom', 'ScrollMagic', 'Flickity', 'Modern
         //lazy-load the parallax backgrounds (data-bg, see jnz_hero_bg()) one screen ahead of the viewport
         var lazy_bg_observer;
 
+        //the @2x file only when the screen shows more pixels than the standard file has
+        function lazy_bg_needs_retina( el ) {
+            var
+                width = parseInt( el.getAttribute('data-bg-width'), 10 ),
+                height = parseInt( el.getAttribute('data-bg-height'), 10 ),
+                needed;
+
+            if ( !width || !height ) {
+                return isRetina();
+            }
+            //background-size: cover scales the image up to fill both directions
+            needed = Math.max( el.clientWidth, el.clientHeight * width / height ) * ( window.devicePixelRatio || 1 );
+            return needed > width;
+        }
+
         function lazy_bg_load( el ) {
-            var src = ( isPortrait() && el.getAttribute('data-bg-mobile') ) || ( isRetina() && el.getAttribute('data-bg-retina') ) || el.getAttribute('data-bg');
+            var src = ( isPortrait() && el.getAttribute('data-bg-mobile') ) || ( el.getAttribute('data-bg-retina') && lazy_bg_needs_retina( el ) && el.getAttribute('data-bg-retina') ) || el.getAttribute('data-bg');
             el.style.backgroundImage = 'url("' + src + '")';
             el.removeAttribute('data-bg');
         }

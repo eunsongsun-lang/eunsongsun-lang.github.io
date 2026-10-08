@@ -1001,12 +1001,17 @@ a,
 /*--------------------------------------------------------------
 ## Main
 --------------------------------------------------------------*/
-#main {
+/*pages show before script.js has loaded, except the products grid, which masonry lays out*/
+.post-type-archive-products #main {
     opacity: 0;
 }
-/*the home page only needs the hero heights below, so it shows before script.js has loaded*/
-.home #main {
-    opacity: 1;
+/*slideshows: keep their space, but hidden until flickity is ready*/
+.carousel:not(.flickity-enabled) {
+    height: 80vh;
+    max-height: 800px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    visibility: hidden;
 }
 /*hero heights until header_height() in script.js sets them exactly*/
 #single-parallax-image,
